@@ -120,13 +120,14 @@ Apply the Decision Table. Do not ask the user. If two patterns both apply, use t
 
 ### Step 3 — Create barrel files
 
-**Export path format — pick one style, stay consistent within a file:**
+**Export path format — two rules, no exceptions:**
 
-| Format | Syntax | When to use |
-|---|---|---|
-| Same-directory relative | `export 'user.dart';` | Files in the same folder as the barrel |
-| Relative (cross-folder) | `export '../../services/services.dart';` | Sibling or parent directories within `lib/` |
-| Package-prefixed | `export 'package:myapp/services/services.dart';` | Cross-layer re-exports, external packages |
+| What you're exporting | Format to use |
+|---|---|
+| File in the **same folder** as the barrel | `export 'user.dart';` |
+| File in **any other folder** (internal or external) | `export 'package:myapp/path/to/file.dart';` |
+
+> **NEVER use relative paths** (`../`, `../../`). Always use `package:` for anything outside the barrel's own folder.
 
 **Folder-named barrel (same-directory exports):**
 ```dart
@@ -137,15 +138,7 @@ export 'comment.dart';
 // DO NOT export: main.dart, *.g.dart, *.freezed.dart, part files
 ```
 
-**Top-level core barrel — relative path style:**
-```dart
-// lib/core/core.dart
-export '../models/models.dart';
-export '../services/services.dart';
-export '../widgets/widgets.dart';
-```
-
-**Top-level core barrel — package path style (equivalent, either is valid):**
+**Top-level core barrel:**
 ```dart
 // lib/core/core.dart
 export 'package:myapp/models/models.dart';
@@ -153,26 +146,23 @@ export 'package:myapp/services/services.dart';
 export 'package:myapp/widgets/widgets.dart';
 ```
 
-**Deep feature barrel using relative paths:**
+**Feature barrel:**
 ```dart
-// lib/features/auth/auth.dart  (2 levels deep from lib/)
-export 'auth_screen.dart';                        // same folder
-export 'auth_controller.dart';                    // same folder
-export '../../shared/widgets/primary_button.dart'; // up 2, into shared/
-export '../../services/auth_service.dart';         // up 2, into services/
+// lib/features/auth/auth.dart
+export 'auth_screen.dart';
+export 'auth_controller.dart';
+export 'package:myapp/shared/widgets/primary_button.dart';
+export 'package:myapp/services/auth_service.dart';
 ```
 
 **`index.dart` barrel (utilities/externals mix):**
 ```dart
 // lib/utilities/index.dart
-export '../app/config/color_config.dart';   // relative — sibling folder
-export '../app/config/font_config.dart';    // relative — sibling folder
-export 'package:flutter/material.dart';    // package — external always uses package:
-export 'package:provider/provider.dart';   // package — external always uses package:
+export 'package:myapp/app/config/color_config.dart';
+export 'package:myapp/app/config/font_config.dart';
+export 'package:flutter/material.dart';
+export 'package:provider/provider.dart';
 ```
-
-> **Rule**: external packages (`flutter/`, `pub.dev`) always use `package:` prefix.
-> Internal files within `lib/` can use either relative (`../../`) or `package:myapp/` — match whatever style the rest of the project uses.
 
 ### Step 4 — Update consuming files
 
@@ -207,6 +197,11 @@ If the user has many files to migrate, add this note:
 ## NEVER Generate These
 
 ```dart
+// ❌ Never use relative paths for cross-folder exports
+export '../models/models.dart';
+export '../../services/auth_service.dart';
+// Use package: instead → export 'package:myapp/services/auth_service.dart';
+
 // ❌ Never re-export main.dart
 export 'main.dart';
 
