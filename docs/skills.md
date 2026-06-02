@@ -20,34 +20,99 @@ Two naming styles exist: folder-named barrels (`models.dart`) and the
 
 ---
 
-## Why Imports Become a Problem
+## How the Skill Activates
 
-As Flutter apps grow, import blocks balloon into long, hard-to-maintain lists:
+```mermaid
+flowchart LR
+    Trigger["User mentions:\n• messy imports\n• barrel files\n• index.dart\n• import churn\n• Barrel Me\n• single_import_generator"]
+    Audit["Audit current imports\nidentify folder groups"]
+    Choose["Choose pattern\nfolder-named or index.dart"]
+    Generate["Generate barrel files\nexport statements"]
+    Show["Show before / after\nto confirm reduction"]
+    Tool["Advise on tooling\nBarrel Me or single_import_generator"]
 
-```dart
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:soon_sak/app/config/color_config.dart';
-import 'package:soon_sak/app/config/font_config.dart';
-import 'package:soon_sak/presentation/base/base_screen.dart';
-import 'package:soon_sak/presentation/common/skeleton_box.dart';
-import 'package:soon_sak/presentation/screens/home/home_view_model.dart';
-// ... 20+ more lines before the actual class
+    Trigger --> Audit --> Choose --> Generate --> Show --> Tool
 ```
 
-**Pain points:**
+---
+
+## Why Imports Become a Problem
+
+```mermaid
+graph TD
+    subgraph Before["Without barrels — every screen imports directly"]
+        S1["home_screen.dart\n12 import lines"]
+        S2["profile_screen.dart\n14 import lines"]
+        S3["settings_screen.dart\n11 import lines"]
+
+        S1 --> U1["user.dart"]
+        S1 --> A1["api_service.dart"]
+        S1 --> C1["color_config.dart"]
+        S2 --> U1
+        S2 --> A1
+        S2 --> C1
+        S3 --> U1
+        S3 --> A1
+        S3 --> C1
+    end
+
+    subgraph After["With barrels — one import per screen"]
+        S4["home_screen.dart\n1 import line"]
+        S5["profile_screen.dart\n1 import line"]
+        S6["settings_screen.dart\n1 import line"]
+        Barrel["core/core.dart\n(barrel)"]
+
+        S4 --> Barrel
+        S5 --> Barrel
+        S6 --> Barrel
+        Barrel --> U2["user.dart"]
+        Barrel --> A2["api_service.dart"]
+        Barrel --> C2["color_config.dart"]
+    end
+```
+
+**Pain points without barrels:**
 - Repetitive boilerplate every time a new screen/widget is created
 - Unnecessary Git merge conflicts when import lines change across branches
 - Unused or duplicate imports accumulate and hurt readability
 
-> **Tip:** Run `dart fix --apply` to auto-remove unused import statements.
+> Run `dart fix --apply` to auto-remove unused import statements before migrating.
 
 ---
 
 ## Approach 1 — Folder-Named Barrel Files (`models.dart`)
 
-Name the barrel after its folder. Best for layer-based architectures
-(models / services / widgets).
+Name the barrel after its folder. Best for **layer-based architectures** (models / services / widgets).
+
+```mermaid
+graph LR
+    subgraph lib
+        subgraph models
+            U["user.dart"]
+            P["post.dart"]
+            C["comment.dart"]
+            MB["models.dart\n(barrel)"]
+        end
+        subgraph services
+            API["api_service.dart"]
+            Auth["auth_service.dart"]
+            SB["services.dart\n(barrel)"]
+        end
+        subgraph widgets
+            Btn["custom_button.dart"]
+            Card["custom_card.dart"]
+            WB["widgets.dart\n(barrel)"]
+        end
+        Core["core/core.dart\n(top-level barrel)"]
+        Screen["any_screen.dart\nimport core/core.dart"]
+    end
+
+    U & P & C --> MB
+    API & Auth --> SB
+    Btn & Card --> WB
+    MB & SB & WB --> Core
+    Core --> Screen
+```
 
 ### Step 1 — Create per-folder barrel files
 
@@ -71,7 +136,7 @@ export 'custom_card.dart';
 export 'loading_indicator.dart';
 ```
 
-### Step 2 — (Optional) Create a top-level core barrel
+### Step 2 — Create a top-level core barrel (optional)
 
 ```dart
 // lib/core/core.dart
@@ -97,10 +162,29 @@ import 'package:myapp/core/core.dart';
 
 ## Approach 2 — `index.dart` (Single Import Convention)
 
-Use `index.dart` as the barrel name — a convention common in projects
-that mix internal and external package exports in one place.
-Ideal for a `utilities/` or `app/` root that aggregates everything
-a screen typically needs.
+Use `index.dart` as the barrel name — common in projects that mix internal and external exports in one place. Ideal for a `utilities/` or `app/` root.
+
+```mermaid
+graph TD
+    subgraph "index.dart aggregates everything a screen needs"
+        Idx["utilities/index.dart"]
+        subgraph Internal
+            CC["color_config.dart"]
+            FC["font_config.dart"]
+            SE["string_extension.dart"]
+        end
+        subgraph External["External packages (re-exported)"]
+            FM["flutter/material.dart"]
+            PR["provider/provider.dart"]
+            IT["intl/intl.dart"]
+        end
+    end
+
+    CC & FC & SE --> Idx
+    FM & PR & IT --> Idx
+    Idx -->|"single import"| HS["HomeScreen"]
+    Idx -->|"single import"| PS["ProfileScreen"]
+```
 
 ### Create `lib/utilities/index.dart`
 
@@ -131,25 +215,54 @@ class HomeScreen extends StatelessWidget {
 
 ### Structured `index.dart` per layer
 
-For layered projects, place an `index.dart` in each layer folder:
+```mermaid
+graph LR
+    subgraph "lib/ layers"
+        UIdx["utilities/index.dart\nconfig · extensions · helpers"]
+        DIdx["domain/index.dart\nmodels · repo interfaces"]
+        DAIdx["data/index.dart\ndata sources · repo impls"]
+        PIdx["presentation/index.dart\nbase classes · common widgets"]
+    end
 
+    Screen["any_screen.dart"] -->|"import utilities"| UIdx
+    Screen -->|"import presentation"| PIdx
+    PIdx --> DIdx
+    DIdx --> DAIdx
 ```
-lib/
-├── utilities/
-│   └── index.dart       ← config, extensions, helpers
-├── domain/
-│   └── index.dart       ← models, repositories (interfaces)
-├── data/
-│   └── index.dart       ← data sources, repository impls
-└── presentation/
-    └── index.dart       ← base classes, common widgets
-```
-
-Each screen then imports only what its layer needs:
 
 ```dart
 import 'package:myapp/utilities/index.dart';
 import 'package:myapp/presentation/index.dart';
+```
+
+---
+
+## Hierarchical Barrel Architecture (large codebases)
+
+```mermaid
+graph TD
+    Core["core/core.dart\ntop-level re-exports everything"]
+
+    subgraph Layer Barrels
+        MB["core/models/models.dart"]
+        SB["core/services/services.dart"]
+        WB["core/widgets/widgets.dart"]
+    end
+
+    subgraph Utilities
+        UIdx["utilities/index.dart\nconfig + extensions + externals"]
+    end
+
+    subgraph Features
+        Auth["features/auth/auth.dart\nfeature barrel"]
+        AS["auth_screen.dart"]
+        AC["auth_controller.dart"]
+    end
+
+    MB & SB & WB --> Core
+    AS & AC --> Auth
+    Core & UIdx --> AnyScreen["Any screen\n2 imports max"]
+    Auth --> AnyScreen
 ```
 
 ---
@@ -178,75 +291,75 @@ rename the barrel to `{name}_barrel.dart` or fall back to `index.dart`.
 
 ## Automating Barrel Generation
 
-### Option A — `single_import_generator` (pub.dev package)
+```mermaid
+flowchart LR
+    Choice{"Workflow type?"}
+    Choice -->|"VS Code user"| BM["Barrel Me extension\nRight-click → Create Barrel\nOne-click project-wide migration"]
+    Choice -->|"CLI / CI pipeline"| SIG["single_import_generator\ndart run ... all / dir / @SingleImport"]
+    Choice -->|"Selective classes only"| Anno["@SingleImport annotation\nmarks specific classes/extensions"]
+```
 
-Generates `index.dart` files from the CLI. Add to `dev_dependencies`:
+### Option A — `single_import_generator`
 
 ```yaml
 dev_dependencies:
   single_import_generator: ^<latest>
 ```
 
-**Generate for all files in a directory (recursive):**
 ```bash
+# All files in directory (recursive)
 dart run single_import_generator -target=lib/presentation all
-```
 
-**Generate for immediate files only (non-recursive):**
-```bash
+# Immediate files only (non-recursive)
 dart run single_import_generator -target=lib/presentation/common dir
 ```
 
-**Generate for files annotated with `@SingleImport`:**
 ```dart
+// Annotate only what should be barrel-exported
 @SingleImport()
 class FrequentlyUsedClass { ... }
 
 @SingleImport()
 extension SomeStringExtension on String { ... }
 ```
+
 ```bash
 dart run single_import_generator -path=lib/utilities
 ```
 
-The `@SingleImport` approach is best when only selected classes/extensions
-should be part of the barrel — not every file in the folder.
-
 ### Option B — "Barrel Me" (VS Code Extension)
 
-Right-click any folder → **"Create Barrel"**. Generates a folder-named barrel
-and optionally migrates all existing imports project-wide.
-
-Key features:
+Right-click any folder → **"Create Barrel"**. Key features:
 - Flat or hierarchical barrel generation
 - Auto-excludes `main.dart`, `part` files, existing barrels
 - Renames conflicting files to `{name}_barrel.dart`
 - One-click import migration across the whole project
-- Zero configuration required
 
 > Search **"Barrel Me"** in the VS Code Extensions Marketplace.
 
 ---
 
-## Hierarchical Barrel Architecture (large codebases)
+## Agent Decision Flow
 
-```
-lib/
-├── core/
-│   ├── core.dart              ← top-level barrel (re-exports sub-barrels)
-│   ├── models/
-│   │   └── models.dart
-│   ├── services/
-│   │   └── services.dart
-│   └── widgets/
-│       └── widgets.dart
-├── utilities/
-│   └── index.dart             ← config + extensions + external packages
-└── features/
-    └── auth/
-        ├── auth.dart          ← feature barrel
-        ├── auth_screen.dart
-        └── auth_controller.dart
+```mermaid
+flowchart TD
+    Start["User has import problem"]
+    Audit["Count imports per screen\nGroup by folder prefix"]
+    Count{"3+ from same folder?"}
+    Mixed{"Mixes external\npackages with internals?"}
+    Size{"Large layered\ncodebase?"}
+    Feature{"Feature-first\narchitecture?"}
+
+    Count -->|Yes| FolderBarrel["Folder-named barrel\nmodels/models.dart"]
+    Count -->|No| Mixed
+    Mixed -->|Yes| IndexDart["index.dart barrel\nutilities/index.dart"]
+    Mixed -->|No| Size
+    Size -->|Yes| Hierarchical["Hierarchical barrels\nper-layer index.dart\n+ top-level core.dart"]
+    Size -->|No| Feature
+    Feature -->|Yes| FeatureBarrel["Feature barrel\nauth/auth.dart"]
+    Feature -->|No| FolderBarrel
+
+    Start --> Audit --> Count
 ```
 
 ---
@@ -255,26 +368,13 @@ lib/
 
 | Situation | Recommendation |
 |---|---|
-| 3+ imports from the same folder | Create a folder-named barrel |
-| Repetitive base imports on every screen | Create `utilities/index.dart` |
+| 3+ imports from the same folder | Folder-named barrel |
+| Repetitive base imports on every screen | `utilities/index.dart` |
 | Mixing external packages with internals | `index.dart` with both export types |
 | Large layered app | Hierarchical barrels per layer |
 | Feature-based monorepo | Per-feature barrel (`auth/auth.dart`) |
 | Existing messy codebase | Barrel Me (VS Code) for one-click migration |
 | CLI / CI workflow | `single_import_generator` with `all` or `dir` flag |
-
----
-
-## Workflow When Helping a User
-
-1. **Audit** — Look at current imports; identify groups sharing a folder prefix or
-   repeated across multiple files.
-2. **Choose style** — Folder-named barrel for layered arch; `index.dart` for
-   utility/config aggregation; or both.
-3. **Generate barrel files** — Write the `export` statements.
-4. **Show before/after** — Demonstrate the import reduction in the consuming file.
-5. **Advise on tooling** — Recommend `single_import_generator` for CLI workflows
-   or Barrel Me for VS Code users.
 
 ---
 
