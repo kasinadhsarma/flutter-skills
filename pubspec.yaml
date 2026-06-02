@@ -1,0 +1,27 @@
+name: flutter_skills
+description: >-
+  A curated reference library of Flutter architecture patterns, security practices,
+  layout guides, and AI-agent skills. Each document is kept under 1,000 lines
+  to fit within a single LLM context window.
+version: 1.0.0
+homepage: https://github.com/kasinadhsarma/flutter-skills
+repository: https://github.com/kasinadhsarma/flutter-skills
+issue_tracker: https://github.com/kasinadhsarma/flutter-skills/issues
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.0.0"
+
+# No runtime dependencies — this is a documentation and skills library.
+# Code examples in the docs reference these packages; add them to your own pubspec.
+
+# dev_dependencies would go here if we add tooling (e.g., markdownlint, link checker)
+
+topics:
+  - flutter
+  - dart
+  - documentation
+  - security
+  - architecture
+  - agent-skills
+  - llm
