@@ -1,8 +1,6 @@
-[SKILL.md](https://github.com/user-attachments/files/28505199/SKILL.md)
-
-```
+---
 name: flutter-barrel-imports
-description:
+description: >
   Apply the barrel file pattern to clean up and organize Flutter/Dart imports.
   Use this skill whenever the user has messy, deeply-nested, or repetitive import
   sections in Flutter files; wants to consolidate imports across models, services,
@@ -11,7 +9,7 @@ description:
   like "Barrel Me" or "single_import_generator". Also triggers for questions about
   scalable import architecture in Dart/Flutter codebases, merge conflicts caused
   by import churn, or reducing boilerplate at the top of every Flutter screen file.
-```
+---
 
 # Flutter Barrel Imports Skill
 
