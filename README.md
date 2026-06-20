@@ -11,12 +11,22 @@ A curated reference library of Flutter architecture patterns, security practices
 
 ## What's Inside
 
-| Document | Purpose | Lines |
+| Document / Skill | Purpose | Lines |
 |---|---|---|
 | [Architecting High-Productivity Systems Under 1,000 Lines](docs/Architecting%20High-Productivity%20Systems%20Under%201%2C000%20Lines.md) | Server-driven UI, fine-grained signals, PocketBase backend, AI context engineering | ~630 |
 | [Flutter App Security Development Roadmap](docs/Flutter%20App%20Security%20Development%20Roadmap.md) | SDLC security gates, secrets management, SSL pinning, RASP, OTA security | ~540 |
 | [Flutter Overflow & Pixel Prevention Guide](docs/Flutter%20Overflow%20Pixel%20Prevention%20Guide.md) | Layout engine mechanics, constraint violations, responsive design, debug tools | ~400 |
-| [Flutter Barrel Imports Skill](docs/skills.md) | Agent skill for organizing Flutter/Dart import sections with barrel files | ~290 |
+| [Flutter Barrel Imports Skill](docs/flutter-barrel-imports.md) | Organize imports with barrel files (`models.dart` or `index.dart` convention) | ~395 |
+| [Flutter Add Integration Test Skill](docs/flutter-add-integration-test.md) | Configure Flutter Driver and integration testing to automate user flows | ~165 |
+| [Flutter Add Widget Preview Skill](docs/flutter-add-widget-preview.md) | Render widgets in real-time, isolated from context, using previews system | ~145 |
+| [Flutter Add Widget Test Skill](docs/flutter-add-widget-test.md) | Component-level testing using `WidgetTester` to verify rendering and interaction | ~155 |
+| [Flutter Apply Architecture Best Practices Skill](docs/flutter-apply-architecture-best-practices.md) | Structured Flutter architecture using a layered approach (UI, Logic, Data) | ~165 |
+| [Flutter Build Responsive Layout Skill](docs/flutter-build-responsive-layout.md) | Build responsive UIs that adapt to mobile, tablet, and desktop form factors | ~140 |
+| [Flutter Fix Layout Issues Skill](docs/flutter-fix-layout-issues.md) | Diagnose and resolve Flutter layout exceptions like flex overflows | ~130 |
+| [Flutter Implement JSON Serialization Skill](docs/flutter-implement-json-serialization.md) | Create model classes with manual/codegen json serialization patterns | ~155 |
+| [Flutter Setup Declarative Routing Skill](docs/flutter-setup-declarative-routing.md) | Configure declarative routing (`go_router`) with deep linking support | ~255 |
+| [Flutter Setup Localization Skill](docs/flutter-setup-localization.md) | Set up multi-language internationalization support with `intl` | ~210 |
+| [Flutter Use HTTP Package Skill](docs/flutter-use-http-package.md) | Execute HTTP requests (GET, POST, etc.) to integrate with REST APIs | ~175 |
 
 ---
 
@@ -57,7 +67,17 @@ flutter-skills/
 │   ├── Architecting High-Productivity Systems Under 1,000 Lines.md
 │   ├── Flutter App Security Development Roadmap.md
 │   ├── Flutter Overflow Pixel Prevention Guide.md
-│   └── skills.md                          ← agent skill (barrel imports)
+│   ├── flutter-add-integration-test.md    ← agent skill
+│   ├── flutter-add-widget-preview.md      ← agent skill
+│   ├── flutter-add-widget-test.md         ← agent skill
+│   ├── flutter-apply-architecture-best-practices.md ← agent skill
+│   ├── flutter-barrel-imports.md          ← agent skill
+│   ├── flutter-build-responsive-layout.md  ← agent skill
+│   ├── flutter-fix-layout-issues.md       ← agent skill
+│   ├── flutter-implement-json-serialization.md ← agent skill
+│   ├── flutter-setup-declarative-routing.md ← agent skill
+│   ├── flutter-setup-localization.md      ← agent skill
+│   └── flutter-use-http-package.md        ← agent skill
 ├── .github/
 │   ├── ISSUE_TEMPLATE/
 │   │   ├── bug_report.md
@@ -89,10 +109,14 @@ flutter-skills/
 | Security (OWASP Mobile Top 10) | Done |
 | Layout & overflow prevention | Done |
 | Barrel imports (agent skill) | Done |
+| Testing & Verification (agent skills) | Done |
+| Responsive Layouts (agent skill) | Done |
+| Declarative Routing (agent skill) | Done |
+| Project Localization (agent skill) | Done |
+| HTTP & API Integration (agent skills)| Done |
 | State management patterns | Planned |
 | Performance profiling | Planned |
 | Flutter Web deployment | Planned |
-| Testing strategies | Planned |
 
 Want to add a topic? See [CONTRIBUTING.md](CONTRIBUTING.md).
 
