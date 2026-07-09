@@ -24,6 +24,7 @@ A curated reference library of Flutter architecture patterns, security practices
 | [Flutter Build Responsive Layout Skill](docs/flutter-build-responsive-layout.md) | Build responsive UIs that adapt to mobile, tablet, and desktop form factors | ~140 |
 | [Flutter Fix Layout Issues Skill](docs/flutter-fix-layout-issues.md) | Diagnose and resolve Flutter layout exceptions like flex overflows | ~130 |
 | [Flutter Implement JSON Serialization Skill](docs/flutter-implement-json-serialization.md) | Create model classes with manual/codegen json serialization patterns | ~155 |
+| [Flutter Init Clean Architecture Skill](docs/flutter-init-clean-architecture.md) | Scaffold the four-layer Presentation/Application/Domain/Infrastructure split for a new project or feature module | ~290 |
 | [Flutter Setup Declarative Routing Skill](docs/flutter-setup-declarative-routing.md) | Configure declarative routing (`go_router`) with deep linking support | ~255 |
 | [Flutter Setup Localization Skill](docs/flutter-setup-localization.md) | Set up multi-language internationalization support with `intl` | ~210 |
 | [Flutter Use HTTP Package Skill](docs/flutter-use-http-package.md) | Execute HTTP requests (GET, POST, etc.) to integrate with REST APIs | ~175 |
@@ -75,6 +76,7 @@ flutter-skills/
 │   ├── flutter-build-responsive-layout.md  ← agent skill
 │   ├── flutter-fix-layout-issues.md       ← agent skill
 │   ├── flutter-implement-json-serialization.md ← agent skill
+│   ├── flutter-init-clean-architecture.md ← agent skill
 │   ├── flutter-setup-declarative-routing.md ← agent skill
 │   ├── flutter-setup-localization.md      ← agent skill
 │   └── flutter-use-http-package.md        ← agent skill
@@ -114,6 +116,7 @@ flutter-skills/
 | Declarative Routing (agent skill) | Done |
 | Project Localization (agent skill) | Done |
 | HTTP & API Integration (agent skills)| Done |
+| Clean Architecture init: Presentation/Application/Domain/Infrastructure (agent skill) | Done |
 | State management patterns | Planned |
 | Performance profiling | Planned |
 | Flutter Web deployment | Planned |
