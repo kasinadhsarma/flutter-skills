@@ -80,6 +80,16 @@ Everything Flutter-specific.
   directly.
 - **Views:** Lean widgets that render ViewModel state and forward user input to it.
 
+### Utils (Not a Layer)
+`utils/` is cross-cutting, not a fifth layer — it has no business logic and no place in
+the dependency graph, so any layer may import it.
+- **Contents:** pure extension methods, formatters (`DateFormat` wrappers), validators
+  (regex/email/phone checks), constants, and typedefs.
+- **Rule:** if a helper needs a repository, use case, or `BuildContext`, it belongs in
+  Application/Infrastructure/Presentation instead — not in `utils/`. A `utils/` file
+  should never import from `domain/`, `application/`, `infrastructure/`, or
+  `presentation/`.
+
 ## Project Structure
 
 Group every layer under the feature, so a whole feature — and its dependency direction —
@@ -87,6 +97,10 @@ can be reviewed, tested, or deleted as one unit.
 
 ```text
 lib/
+├── core/
+│   ├── domain/            # shared, cross-feature repository contracts (e.g. AuthRepository)
+│   ├── infrastructure/    # implementations of the above
+│   └── utils/             # extensions, formatters, validators, constants — no business logic
 └── features/
     └── profile/
         ├── domain/
@@ -113,6 +127,8 @@ lib/
 
 Shared, cross-feature Domain contracts (e.g. `AuthRepository`) live in
 `lib/core/domain/`, with their Infrastructure implementations in `lib/core/infrastructure/`.
+Feature-local helpers that don't warrant a `lib/core/utils/` entry can live in a
+`utils/` folder directly under the feature (`lib/features/profile/utils/`).
 
 ## Workflow: Initializing a Feature Module
 
@@ -126,7 +142,7 @@ Copy this checklist when scaffolding a new feature under `lib/features/<feature_
 - [ ] **Step 5: Implement Application use cases.** One callable class per user intent, injected with the Domain contract (never the Infrastructure implementation type).
 - [ ] **Step 6: Implement Presentation.** ViewModel injected with use cases; View rendering ViewModel state.
 - [ ] **Step 7: Wire dependency injection.** Register the concrete Infrastructure repository against the Domain abstract type; register use cases and ViewModels. See [Dependency Injection Wiring](#dependency-injection-wiring).
-- [ ] **Step 8: Validate the boundary.** Confirm `domain/` and `application/` have zero imports from `infrastructure/` or `flutter/`. Run unit tests for use cases with a fake repository — no widget test harness required.
+- [ ] **Step 8: Validate the boundary.** Confirm `domain/` and `application/` have zero imports from `infrastructure/` or `flutter/`, and that no `utils/` file imports from any of the four layers. Run unit tests for use cases with a fake repository — no widget test harness required.
   - *Feedback Loop:* Import-lint or grep for `package:flutter` inside `domain/`/`application/` → fix any violation → re-check.
 
 ## Examples
